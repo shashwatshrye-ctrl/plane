@@ -9,14 +9,14 @@ npm install
 npm run dev
 ```
 
-Copy `.env.example` to `.env.local` and fill in your OpenSky client ID and client secret:
+Copy `.env.example` to `.env` and fill in your OpenSky client ID and client secret:
 
 ```text
 OPENSKY_CLIENT_ID=your-client-id
 OPENSKY_CLIENT_SECRET=your-client-secret
 ```
 
-Keep `.env.local` private; it is excluded from version control. Open [http://localhost:3000](http://localhost:3000). OpenSky may apply rate limits to API requests.
+Keep `.env` private; it is excluded from version control. Open [http://localhost:3000](http://localhost:3000). OpenSky may apply rate limits to API requests.
 
 The browser refreshes visible dashboards every 15 seconds, and the API route briefly caches results to reduce upstream requests. If OpenSky is unavailable before a live response is received, the dashboard shows clearly labeled sample traffic; after a successful response it keeps the most recent positions visible during temporary upstream failures.
 
