@@ -2,6 +2,10 @@
 
 A small live air-traffic dashboard built with Next.js, TypeScript, and Tailwind CSS. Aircraft positions are provided by the OpenSky Network REST API.
 
+## Hosted version
+
+Visit the live dashboard at [planetrackig.vercel.app](https://planetrackig.vercel.app/).
+
 ## Run locally
 
 ```bash
