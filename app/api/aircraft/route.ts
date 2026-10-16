@@ -1,0 +1,129 @@
+import { NextRequest, NextResponse } from "next/server";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+let cachedToken: { token: string; expiresAt: number } | null = null;
+let cachedData: { data: any; timestamp: number } | null = null;
+const CACHE_TTL_MS = 10_000;
+
+async function getAccessToken() {
+  const now = Date.now();
+  if (cachedToken && cachedToken.expiresAt > now + 30_000) {
+    return cachedToken.token;
+  }
+
+  const credentialsPath = path.join(
+    process.cwd(),
+    "secrets",
+    "credentials.json"
+  );
+
+  const credentials = JSON.parse(await readFile(credentialsPath, "utf8"));
+
+  const tokenResponse = await fetch(
+    "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "client_credentials",
+        client_id: credentials.clientId,
+        client_secret: credentials.clientSecret,
+      }),
+      cache: "no-store",
+    }
+  );
+
+  if (!tokenResponse.ok) {
+    throw new Error(`OpenSky authentication failed: ${tokenResponse.status}`);
+  }
+
+  const tokenData = await tokenResponse.json();
+  cachedToken = {
+    token: tokenData.access_token,
+    expiresAt: now + (tokenData.expires_in || 300) * 1000,
+  };
+  return tokenData.access_token;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const callsign = searchParams.get("callsign");
+    const trackIcao = searchParams.get("track");
+    const token = await getAccessToken();
+
+    // 1. Fetch Route by Callsign if requested
+    if (callsign) {
+      const routeRes = await fetch(
+        `https://opensky-network.org/api/routes?callsign=${encodeURIComponent(callsign.trim())}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        }
+      );
+      if (!routeRes.ok) {
+        return NextResponse.json({ route: null, callsign }, { status: 200 });
+      }
+      const text = await routeRes.text();
+      if (!text) {
+        return NextResponse.json({ route: null, callsign }, { status: 200 });
+      }
+      return NextResponse.json(JSON.parse(text));
+    }
+
+    // 2. Fetch Historical Track by icao24 if requested
+    if (trackIcao) {
+      const trackRes = await fetch(
+        `https://opensky-network.org/api/tracks/all?icao24=${encodeURIComponent(trackIcao.trim())}&time=0`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        }
+      );
+      if (!trackRes.ok) {
+        return NextResponse.json({ path: [] }, { status: 200 });
+      }
+      const trackData = await trackRes.json();
+      return NextResponse.json(trackData);
+    }
+
+    // 3. Fetch All Live Aircraft States
+    const now = Date.now();
+    if (cachedData && now - cachedData.timestamp < CACHE_TTL_MS) {
+      return NextResponse.json(cachedData.data);
+    }
+
+    const aircraftResponse = await fetch(
+      "https://opensky-network.org/api/states/all",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      }
+    );
+
+    if (!aircraftResponse.ok) {
+      if (cachedData) return NextResponse.json(cachedData.data);
+      return NextResponse.json(
+        { error: "Failed to fetch aircraft data" },
+        { status: 502 }
+      );
+    }
+
+    const data = await aircraftResponse.json();
+    cachedData = { data, timestamp: Date.now() };
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("OpenSky API error:", error);
+    if (cachedData) return NextResponse.json(cachedData.data);
+    return NextResponse.json(
+      { error: "Unable to retrieve aircraft data" },
+      { status: 500 }
+    );
+  }
+}
+
