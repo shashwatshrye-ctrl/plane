@@ -14,7 +14,7 @@ async function getAccessToken() {
   const clientSecret = process.env.OPENSKY_CLIENT_SECRET;
   if (!clientId || !clientSecret) {
     throw new Error(
-      "Missing OpenSky credentials. Set OPENSKY_CLIENT_ID and OPENSKY_CLIENT_SECRET in .env.local."
+      "Missing OpenSky credentials. Set OPENSKY_CLIENT_ID and OPENSKY_CLIENT_SECRET in .env."
     );
   }
 
