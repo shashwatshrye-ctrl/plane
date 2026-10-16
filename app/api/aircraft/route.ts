@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
 let cachedData: { data: any; timestamp: number } | null = null;
@@ -12,13 +10,13 @@ async function getAccessToken() {
     return cachedToken.token;
   }
 
-  const credentialsPath = path.join(
-    process.cwd(),
-    "secrets",
-    "credentials.json"
-  );
-
-  const credentials = JSON.parse(await readFile(credentialsPath, "utf8"));
+  const clientId = process.env.OPENSKY_CLIENT_ID;
+  const clientSecret = process.env.OPENSKY_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
+    throw new Error(
+      "Missing OpenSky credentials. Set OPENSKY_CLIENT_ID and OPENSKY_CLIENT_SECRET in .env.local."
+    );
+  }
 
   const tokenResponse = await fetch(
     "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token",
@@ -29,8 +27,8 @@ async function getAccessToken() {
       },
       body: new URLSearchParams({
         grant_type: "client_credentials",
-        client_id: credentials.clientId,
-        client_secret: credentials.clientSecret,
+        client_id: clientId,
+        client_secret: clientSecret,
       }),
       cache: "no-store",
     }
