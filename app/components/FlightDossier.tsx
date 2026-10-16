@@ -29,7 +29,11 @@ export default function FlightDossier({
       <aside className="absolute right-0 top-0 bottom-0 z-20 flex w-96 flex-col border-l border-neutral-800 bg-[#181b1ff8] shadow-2xl backdrop-blur-xl overflow-y-auto">
         <div className="p-4 flex flex-col gap-4 text-center">
           <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-6">
-            <div className="text-3xl mb-2">✈</div>
+            <div className="mb-2 flex justify-center text-neutral-400">
+              <svg aria-hidden="true" className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2 14 9l7 4v2l-7-2-1 6 3 2v1l-4-1-4 1v-1l3-2-1-6-7 2v-2l7-4 2-7Z" />
+              </svg>
+            </div>
             <h3 className="text-sm font-bold text-white mb-1">Select an aircraft</h3>
             <p className="text-xs text-neutral-400">
               Click any yellow airplane marker on the map to inspect its real OpenSky telemetry, route, and historical flight track.
@@ -43,17 +47,19 @@ export default function FlightDossier({
   return (
     <aside className="absolute right-0 top-0 bottom-0 z-20 flex w-96 flex-col border-l border-neutral-800 bg-[#181b1ff8] shadow-2xl backdrop-blur-xl overflow-y-auto">
       <div className="flex flex-col">
-        {/* Header Banner */}
         <div className="relative h-36 w-full bg-gradient-to-br from-neutral-800 via-neutral-900 to-[#181b1f] p-4 flex flex-col justify-between border-b border-neutral-800">
           <div className="flex items-center justify-between text-xs">
-            <span className="rounded bg-yellow-400/20 border border-yellow-400/40 px-2 py-0.5 font-bold text-yellow-400">
+            <span className="ui-chip ui-chip-accent">
               {selectedFlight.category}
             </span>
             <button
               onClick={onClose}
               className="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-neutral-800 transition"
+              aria-label="Close flight dossier"
             >
-              ✕
+              <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" d="m6 6 12 12M18 6 6 18" />
+              </svg>
             </button>
           </div>
 
@@ -63,14 +69,13 @@ export default function FlightDossier({
             </div>
             <div className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
               <span>{selectedFlight.callsign}</span>
-              <span className="text-xs font-mono font-bold text-yellow-400 bg-neutral-800/80 px-1.5 py-0.5 rounded border border-neutral-700">
+              <span className="ui-chip ui-chip-accent font-mono">
                 HEX {selectedFlight.id.toUpperCase()}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Route Bar */}
         <div className="border-b border-neutral-800 bg-neutral-900/60 p-4">
           {flightRoute ? (
             <div className="flex items-center justify-between">
@@ -79,7 +84,14 @@ export default function FlightDossier({
                 <span className="text-xs font-semibold text-slate-200">Origin ICAO</span>
               </div>
               <div className="flex flex-1 flex-col items-center px-4">
-                <span className="text-yellow-400 text-lg">✈ ➔</span>
+                <span className="flex items-center text-yellow-400">
+                  <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2 14 9l7 4v2l-7-2-1 6 3 2v1l-4-1-4 1v-1l3-2-1-6-7 2v-2l7-4 2-7Z" />
+                  </svg>
+                  <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m-6-6 6 6-6 6" />
+                  </svg>
+                </span>
                 <span className="text-[10px] font-mono text-neutral-400">
                   {flightRoute.operatorIata ? `FLIGHT ${flightRoute.operatorIata}${flightRoute.flightNumber || ""}` : "ACTIVE ROUTE"}
                 </span>
@@ -96,7 +108,7 @@ export default function FlightDossier({
                 <span className="text-[11px] text-neutral-400">{selectedFlight.country} Airspace</span>
               </div>
               <div className="text-right">
-                <span className="rounded bg-emerald-500/20 text-emerald-400 px-2 py-0.5 text-[10px] font-bold border border-emerald-500/40">
+                <span className="ui-chip ui-chip-live uppercase">
                   {selectedFlight.positionSource}
                 </span>
               </div>
@@ -104,13 +116,15 @@ export default function FlightDossier({
           )}
         </div>
 
-        {/* Quick Action Bar */}
         <div className="grid grid-cols-4 border-b border-neutral-800 bg-neutral-900/30 text-center">
           <button
             onClick={onCenterFlight}
             className="flex flex-col items-center py-2.5 text-[10px] font-bold text-slate-300 hover:text-yellow-400 hover:bg-neutral-800/40 transition border-r border-neutral-800"
           >
-            <span>📍</span>
+            <svg aria-hidden="true" className="mb-1 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+              <circle cx="12" cy="10" r="2.5" />
+            </svg>
             <span>CENTER</span>
           </button>
           <button
@@ -119,33 +133,39 @@ export default function FlightDossier({
               isFollowing ? "text-yellow-400 bg-neutral-800/80" : "text-slate-300 hover:text-yellow-400 hover:bg-neutral-800/40"
             }`}
           >
-            <span>🎯</span>
+            <svg aria-hidden="true" className="mb-1 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="9" />
+              <circle cx="12" cy="12" r="5" />
+              <circle cx="12" cy="12" r="1" />
+            </svg>
             <span>{isFollowing ? "FOLLOWING" : "FOLLOW"}</span>
           </button>
           <button
             onClick={onOpenHud}
             className="flex flex-col items-center py-2.5 text-[10px] font-bold text-slate-300 hover:text-yellow-400 hover:bg-neutral-800/40 transition border-r border-neutral-800"
           >
-            <span>🛩</span>
+            <svg aria-hidden="true" className="mb-1 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2 14 9l7 4v2l-7-2-1 6 3 2v1l-4-1-4 1v-1l3-2-1-6-7 2v-2l7-4 2-7Z" />
+            </svg>
             <span>3D HUD</span>
           </button>
           <button
             onClick={() => alert(`OpenSky ID: ${selectedFlight.id}\nCallsign: ${selectedFlight.callsign}\nLat: ${selectedFlight.latitude}\nLng: ${selectedFlight.longitude}`)}
             className="flex flex-col items-center py-2.5 text-[10px] font-bold text-slate-300 hover:text-yellow-400 hover:bg-neutral-800/40 transition"
           >
-            <span>📋</span>
+            <svg aria-hidden="true" className="mb-1 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 0 0-2 2v13h16V7a2 2 0 0 0-2-2h-2M8 3h8v4H8zM8 12h8m-8 4h8" />
+            </svg>
             <span>INFO</span>
           </button>
         </div>
 
-        {/* Telemetry Metrics Grid */}
         <div className="p-4 flex flex-col gap-3">
           <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
             Real-Time Flight Telemetry (OpenSky API)
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">
-            {/* Calibrated Altitude */}
             <div className="rounded-lg border border-neutral-800 bg-neutral-900/70 p-2.5">
               <span className="text-[10px] text-neutral-400 block mb-0.5">BARO ALTITUDE</span>
               <div className="flex items-baseline justify-between">
@@ -159,7 +179,6 @@ export default function FlightDossier({
               </span>
             </div>
 
-            {/* Ground Speed */}
             <div className="rounded-lg border border-neutral-800 bg-neutral-900/70 p-2.5">
               <span className="text-[10px] text-neutral-400 block mb-0.5">GROUND SPEED</span>
               <div className="flex items-baseline justify-between">
@@ -173,7 +192,6 @@ export default function FlightDossier({
               </span>
             </div>
 
-            {/* Track / Heading */}
             <div className="rounded-lg border border-neutral-800 bg-neutral-900/70 p-2.5">
               <span className="text-[10px] text-neutral-400 block mb-0.5">TRUE TRACK / HEADING</span>
               <div className="flex items-baseline justify-between">
@@ -195,7 +213,6 @@ export default function FlightDossier({
               <span className="text-[10px] text-neutral-400">Magnetic Course</span>
             </div>
 
-            {/* Squawk Code */}
             <div className="rounded-lg border border-neutral-800 bg-neutral-900/70 p-2.5">
               <span className="text-[10px] text-neutral-400 block mb-0.5">SQUAWK CODE</span>
               <div className="flex items-baseline justify-between">
@@ -216,7 +233,6 @@ export default function FlightDossier({
             </div>
           </div>
 
-          {/* OpenSky Aircraft Details */}
           <div className="rounded-lg border border-neutral-800 bg-neutral-900/70 p-3 text-xs flex flex-col gap-2">
             <div className="flex justify-between border-b border-neutral-800/80 pb-1.5">
               <span className="text-neutral-400">ICAO 24-bit Address</span>
@@ -254,7 +270,6 @@ export default function FlightDossier({
             </div>
           </div>
 
-          {/* Historical Track Waypoints Count */}
           <div className="rounded bg-neutral-900/40 border border-neutral-800/60 p-2 text-[11px] text-neutral-400 flex items-center justify-between">
             <span>Recorded GPS Track:</span>
             <span className="font-bold text-yellow-400 font-mono">

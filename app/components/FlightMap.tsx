@@ -13,7 +13,6 @@ interface FlightMapProps {
   showWeatherOverlay: boolean;
 }
 
-// SVG Plane Marker generator in iconic FR24 Golden Yellow (#f7ce00)
 function createPlaneMarkerSvg(heading: number, isSelected: boolean) {
   const fillColor = isSelected ? "#ef4444" : "#f7ce00";
   const strokeColor = isSelected ? "#ffffff" : "#181b1f";
@@ -45,7 +44,6 @@ export default function FlightMap({
 
   const selectedFlight = flights.find((f) => f.id === selectedFlightId);
 
-  // Initialize Leaflet Map
   useEffect(() => {
     if (typeof window === "undefined" || !mapContainerRef.current) return;
     let isMounted = true;
@@ -54,7 +52,6 @@ export default function FlightMap({
       if (!isMounted || !mapContainerRef.current) return;
       if (mapRef.current) return;
 
-      // Fix default Leaflet icon paths
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
@@ -106,7 +103,6 @@ export default function FlightMap({
     };
   }, []);
 
-  // Update Tile Layer on mapType change
   useEffect(() => {
     if (!mapRef.current) return;
     import("leaflet").then((L) => {
@@ -138,7 +134,6 @@ export default function FlightMap({
     });
   }, [mapType]);
 
-  // Update Aircraft Markers
   useEffect(() => {
     if (!mapRef.current) return;
     import("leaflet").then((L) => {
@@ -152,7 +147,7 @@ export default function FlightMap({
 
         const customIcon = L.divIcon({
           html: iconHtml,
-          className: `fr24-plane-marker ${isSelected ? "selected" : ""}`,
+          className: `plane-marker ${isSelected ? "selected" : ""}`,
           iconSize: [28, 28],
           iconAnchor: [14, 14],
         });
@@ -174,7 +169,7 @@ export default function FlightMap({
               <span class="text-slate-400 text-[9px]">${flight.altitudeFt ? `${flight.altitudeFt.toLocaleString()} ft` : "—"} · ${flight.velocityKts ? `${flight.velocityKts} kts` : "—"}</span>
             </div>`,
             {
-              className: "fr24-tooltip",
+              className: "flight-tooltip",
               direction: "top",
               offset: [0, -14],
             }
@@ -191,7 +186,6 @@ export default function FlightMap({
     });
   }, [flights, selectedFlightId, onSelectFlightId]);
 
-  // Draw Real OpenSky Track
   useEffect(() => {
     if (!mapRef.current) return;
     import("leaflet").then((L) => {
@@ -224,7 +218,7 @@ export default function FlightMap({
       }).bindTooltip(`<b>${selectedFlight.callsign}</b> (${selectedFlight.country})`, {
         permanent: true,
         direction: "bottom",
-        className: "fr24-tooltip",
+        className: "flight-tooltip",
       });
 
       trackGroup.addLayer(currentPin);
@@ -250,15 +244,12 @@ export default function FlightMap({
 
   return (
     <div className="relative flex-1 w-full h-full overflow-hidden">
-      {/* Leaflet Container */}
       <div ref={mapContainerRef} className="absolute inset-0 h-full w-full z-0" />
 
-      {/* Weather Overlay */}
       {showWeatherOverlay && (
         <div className="pointer-events-none absolute inset-0 z-10 bg-radial from-emerald-500/10 via-blue-500/10 to-transparent mix-blend-screen opacity-70" />
       )}
 
-      {/* Floating Right Map Controls */}
       <div className="absolute right-4 top-4 z-20 flex flex-col gap-1.5">
         <div className="flex flex-col rounded-lg border border-neutral-800 bg-[#181b1fe6] shadow-xl backdrop-blur-md overflow-hidden">
           <button

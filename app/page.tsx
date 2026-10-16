@@ -12,7 +12,7 @@ const FlightDashboard = dynamic(() => import("./flight-dashboard"), {
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
         </svg>
         <span className="text-sm font-semibold tracking-wider text-slate-300 uppercase">
-          Initializing Flightradar24 Map…
+          Initializing live flight map…
         </span>
       </div>
     </div>
@@ -22,4 +22,3 @@ const FlightDashboard = dynamic(() => import("./flight-dashboard"), {
 export default function Home() {
   return <FlightDashboard />;
 }
-

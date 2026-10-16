@@ -26,30 +26,31 @@ export default function LeftWidgets({
 
   return (
     <aside className="pointer-events-none absolute top-4 left-4 z-20 flex w-76 flex-col gap-3">
-      {/* Card 1: Live Active Airspace Flights */}
       <div className="pointer-events-auto rounded-lg border border-neutral-800 bg-[#181b1fe8] shadow-2xl backdrop-blur-md overflow-hidden transition-all">
-        <div
+        <button
+          type="button"
           onClick={() => setTrackedCardsCollapsed(!trackedCardsCollapsed)}
-          className="flex cursor-pointer items-center justify-between border-b border-neutral-800/80 px-3 py-2 bg-neutral-900/40 hover:bg-neutral-800/40 transition"
+          aria-expanded={!trackedCardsCollapsed}
+          className="group flex w-full cursor-pointer items-center justify-between border-b border-neutral-800/80 px-3 py-2 bg-neutral-900/40 text-left transition duration-150 hover:bg-neutral-800/40 active:scale-[0.99]"
         >
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-slate-100 tracking-tight">Active live flights</span>
-            <span className="rounded bg-emerald-500/20 border border-emerald-500/40 px-1 py-0.2 text-[9px] font-bold text-emerald-400">
+            <span className="ui-chip ui-chip-live">
               LIVE
             </span>
             <span className="text-neutral-500 text-xs">ⓘ</span>
           </div>
-          <button className="text-neutral-400 hover:text-white transition">
+          <span className="text-neutral-400 transition-colors duration-150 group-hover:text-white">
             <svg
-              className={`h-4 w-4 transform transition-transform ${trackedCardsCollapsed ? "rotate-180" : ""}`}
+              className={`h-4 w-4 transform transition-transform duration-200 ${trackedCardsCollapsed ? "rotate-180" : ""}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-          </button>
-        </div>
+          </span>
+        </button>
 
         {!trackedCardsCollapsed && (
           <div className="divide-y divide-neutral-800/60 max-h-60 overflow-y-auto">
@@ -68,11 +69,11 @@ export default function LeftWidgets({
                       <span className="text-xs font-black text-slate-200">
                         {index + 1}. {flight.callsign}
                       </span>
-                      <span className="rounded bg-neutral-800 px-1 py-0.2 text-[9px] font-mono text-neutral-300 border border-neutral-700">
+                      <span className="ui-chip font-mono">
                         {flight.id.toUpperCase()}
                       </span>
                       {flight.squawk === "7700" && (
-                        <span className="rounded bg-red-600 px-1 py-0.2 text-[9px] font-bold text-white animate-pulse">
+                        <span className="ui-chip ui-chip-danger">
                           EMERGENCY
                         </span>
                       )}
@@ -97,30 +98,31 @@ export default function LeftWidgets({
         )}
       </div>
 
-      {/* Card 2: Airspace Statistics Derived From Live Feed */}
       {airspaceStats && (
         <div className="pointer-events-auto rounded-lg border border-neutral-800 bg-[#181b1fe8] shadow-2xl backdrop-blur-md overflow-hidden transition-all">
-          <div
+          <button
+            type="button"
             onClick={() => setStatsCardCollapsed(!statsCardCollapsed)}
-            className="flex cursor-pointer items-center justify-between border-b border-neutral-800/80 px-3 py-2 bg-neutral-900/40 hover:bg-neutral-800/40 transition"
+            aria-expanded={!statsCardCollapsed}
+            className="group flex w-full cursor-pointer items-center justify-between border-b border-neutral-800/80 px-3 py-2 bg-neutral-900/40 text-left transition duration-150 hover:bg-neutral-800/40 active:scale-[0.99]"
           >
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-100 tracking-tight">Airspace metrics</span>
-              <span className="rounded bg-amber-500/20 border border-amber-500/40 px-1 py-0.2 text-[9px] font-bold text-amber-400">
+              <span className="ui-chip ui-chip-warning">
                 REALTIME
               </span>
             </div>
-            <button className="text-neutral-400 hover:text-white transition">
+            <span className="text-neutral-400 transition-colors duration-150 group-hover:text-white">
               <svg
-                className={`h-4 w-4 transform transition-transform ${statsCardCollapsed ? "rotate-180" : ""}`}
+                className={`h-4 w-4 transform transition-transform duration-200 ${statsCardCollapsed ? "rotate-180" : ""}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
-            </button>
-          </div>
+            </span>
+          </button>
 
           {!statsCardCollapsed && (
             <div className="p-3 flex flex-col gap-2.5 text-xs">

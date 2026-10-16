@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Flightradar24: Live Flight Tracker - Real-Time Flight Tracker Map",
-  description: "The world's most popular flight tracker. Track planes in real-time on our flight tracker map and get up-to-date flight status & airport information.",
+  title: "Live Flight Tracker",
+  description: "Track live aircraft and view real-time flight information.",
 };
 
 export default function RootLayout({
@@ -38,4 +38,3 @@ export default function RootLayout({
     </html>
   );
 }
-

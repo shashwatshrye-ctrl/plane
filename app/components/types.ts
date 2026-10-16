@@ -1,21 +1,21 @@
 export interface Flight {
-  id: string; // icao24 hex transponder address
+  id: string;
   callsign: string;
-  country: string; // origin_country from OpenSky
+  country: string;
   latitude: number;
   longitude: number;
-  baroAltitude: number | null; // meters
-  altitudeFt: number | null; // feet
-  geoAltitude: number | null; // meters
-  velocityKts: number | null; // knots
-  velocityKmh: number | null; // km/h
-  verticalRateFpm: number | null; // feet per minute
-  heading: number | null; // degrees 0-360
+  baroAltitude: number | null;
+  altitudeFt: number | null;
+  geoAltitude: number | null;
+  velocityKts: number | null;
+  velocityKmh: number | null;
+  verticalRateFpm: number | null;
+  heading: number | null;
   squawk: string | null;
   onGround: boolean;
-  positionSource: string; // ADS-B, MLAT, etc.
-  category: string; // Wake turbulence category
-  lastContact: number; // Unix epoch
+  positionSource: string;
+  category: string;
+  lastContact: number;
 }
 
 export interface FlightRoute {
@@ -27,7 +27,6 @@ export interface FlightRoute {
 
 export type MapType = "dark" | "satellite" | "light";
 
-// Parser to convert OpenSky state vectors into structured Flight objects
 export function parseOpenSkyState(state: any): Flight | null {
   const [
     icao24,

@@ -10,14 +10,12 @@ import BottomToolbar from "./components/BottomToolbar";
 import CockpitHudModal from "./components/CockpitHudModal";
 
 export default function FlightDashboard() {
-  // Global Live Aircraft States
   const [flights, setFlights] = useState<Flight[]>([]);
   const [totalLivePlanes, setTotalLivePlanes] = useState<number>(0);
   const [selectedFlightId, setSelectedFlightId] = useState<string | null>(null);
   const [flightRoute, setFlightRoute] = useState<FlightRoute | null>(null);
   const [flightTrack, setFlightTrack] = useState<[number, number][]>([]);
 
-  // UI / Map States
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
   const [utcTime, setUtcTime] = useState("");
@@ -30,13 +28,11 @@ export default function FlightDashboard() {
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [isFetchingLive, setIsFetchingLive] = useState(false);
 
-  // Selected Flight Object
   const selectedFlight = useMemo(
     () => flights.find((f) => f.id === selectedFlightId) || null,
     [flights, selectedFlightId]
   );
 
-  // Real-Time UTC Clock
   useEffect(() => {
     const updateTime = () => {
       setUtcTime(
@@ -53,7 +49,6 @@ export default function FlightDashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch real-time aircraft from OpenSky /api/aircraft
   const fetchLiveAircraft = useCallback(async () => {
     try {
       setIsFetchingLive(true);
@@ -71,14 +66,12 @@ export default function FlightDashboard() {
         if (parsed && !parsed.onGround && parsed.altitudeFt != null) {
           parsedFlights.push(parsed);
           count++;
-          // Active airborne flights for smooth 60fps Leaflet performance
           if (count >= 500) break;
         }
       }
 
       setFlights(parsedFlights);
 
-      // Default select the first active flight if none selected
       setSelectedFlightId((current) => {
         if (current && parsedFlights.some((f) => f.id === current)) return current;
         return parsedFlights[0]?.id || null;
@@ -90,14 +83,12 @@ export default function FlightDashboard() {
     }
   }, []);
 
-  // Poll live feed every 12 seconds
   useEffect(() => {
     fetchLiveAircraft();
     const interval = setInterval(fetchLiveAircraft, 12000);
     return () => clearInterval(interval);
   }, [fetchLiveAircraft]);
 
-  // Fetch real OpenSky Route & Track when an aircraft is selected
   useEffect(() => {
     if (!selectedFlightId) {
       setFlightRoute(null);
@@ -108,7 +99,6 @@ export default function FlightDashboard() {
     const flight = flights.find((f) => f.id === selectedFlightId);
     if (!flight) return;
 
-    // 1. Fetch real OpenSky historical GPS track
     fetch(`/api/aircraft?track=${encodeURIComponent(flight.id)}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((trackData) => {
@@ -123,7 +113,6 @@ export default function FlightDashboard() {
       })
       .catch(() => setFlightTrack([[flight.latitude, flight.longitude]]));
 
-    // 2. Fetch real OpenSky filed route by callsign
     if (flight.callsign && flight.callsign.length >= 3) {
       fetch(`/api/aircraft?callsign=${encodeURIComponent(flight.callsign)}`, { cache: "no-store" })
         .then((r) => r.json())
@@ -145,13 +134,11 @@ export default function FlightDashboard() {
     }
   }, [selectedFlightId, flights]);
 
-  // Select flight
   const handleSelectFlight = useCallback((flight: Flight) => {
     setSelectedFlightId(flight.id);
     setRightPanelOpen(true);
   }, []);
 
-  // Filter flights by search, altitude, and speed
   const filteredFlights = useMemo(() => {
     return flights.filter((f) => {
       const query = searchQuery.toLowerCase();
@@ -166,7 +153,6 @@ export default function FlightDashboard() {
     });
   }, [flights, searchQuery, altitudeRange, speedRange]);
 
-  // Dynamic Airspace Statistics derived directly from live OpenSky data
   const airspaceStats = useMemo(() => {
     if (!flights.length) return null;
     const total = flights.length;
@@ -193,7 +179,6 @@ export default function FlightDashboard() {
 
   return (
     <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-[#181b1f] text-slate-100 select-none">
-      {/* 1. Modular Top Navigation Bar */}
       <TopNavBar
         mapType={mapType}
         setMapType={setMapType}
@@ -204,7 +189,6 @@ export default function FlightDashboard() {
         filteredFlights={filteredFlights}
         onSelectFlight={handleSelectFlight}
         totalLivePlanes={totalLivePlanes}
-        isFetchingLive={isFetchingLive}
         utcTime={utcTime}
         rightPanelOpen={rightPanelOpen}
         setRightPanelOpen={setRightPanelOpen}
@@ -213,9 +197,7 @@ export default function FlightDashboard() {
         }}
       />
 
-      {/* 2. Main Map Workspace & Modular Panels */}
-      <div className="relative flex flex-1 w-full h-[calc(100vh-56px)] overflow-hidden">
-        {/* Leaflet Map */}
+      <div className="relative flex flex-1 w-full h-[calc(100vh-62px)] overflow-hidden">
         <FlightMap
           flights={filteredFlights}
           selectedFlightId={selectedFlightId}
@@ -229,7 +211,6 @@ export default function FlightDashboard() {
           showWeatherOverlay={showWeatherOverlay}
         />
 
-        {/* Floating Left Cards (Active Flights & Real-time Metrics) */}
         <LeftWidgets
           flights={filteredFlights}
           selectedFlightId={selectedFlightId}
@@ -237,7 +218,6 @@ export default function FlightDashboard() {
           airspaceStats={airspaceStats}
         />
 
-        {/* Floating Bottom Toolbar (Settings, Filters, Weather) */}
         <BottomToolbar
           mapType={mapType}
           setMapType={setMapType}
@@ -251,7 +231,6 @@ export default function FlightDashboard() {
           isFetchingLive={isFetchingLive}
         />
 
-        {/* 3D Cockpit HUD Modal Simulator */}
         {showCockpitHud && selectedFlight && (
           <CockpitHudModal
             flight={selectedFlight}
@@ -259,7 +238,6 @@ export default function FlightDashboard() {
           />
         )}
 
-        {/* Right Side Panel: Flight Dossier */}
         {rightPanelOpen && (
           <FlightDossier
             selectedFlight={selectedFlight}
@@ -268,7 +246,6 @@ export default function FlightDashboard() {
             onClose={() => setSelectedFlightId(null)}
             onCenterFlight={() => {
               if (selectedFlight) {
-                // Centers camera
               }
             }}
             isFollowing={isFollowing}

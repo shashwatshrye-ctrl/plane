@@ -55,7 +55,6 @@ export async function GET(request: NextRequest) {
     const trackIcao = searchParams.get("track");
     const token = await getAccessToken();
 
-    // 1. Fetch Route by Callsign if requested
     if (callsign) {
       const routeRes = await fetch(
         `https://opensky-network.org/api/routes?callsign=${encodeURIComponent(callsign.trim())}`,
@@ -74,7 +73,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(JSON.parse(text));
     }
 
-    // 2. Fetch Historical Track by icao24 if requested
     if (trackIcao) {
       const trackRes = await fetch(
         `https://opensky-network.org/api/tracks/all?icao24=${encodeURIComponent(trackIcao.trim())}&time=0`,
@@ -90,7 +88,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(trackData);
     }
 
-    // 3. Fetch All Live Aircraft States
     const now = Date.now();
     if (cachedData && now - cachedData.timestamp < CACHE_TTL_MS) {
       return NextResponse.json(cachedData.data);
